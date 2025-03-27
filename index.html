@@ -113,6 +113,7 @@
                 data.forEach(movie => {
                     const movieElement = document.createElement('div');
                     movieElement.classList.add('movie');
+                    movieElement.setAttribute('data-id', movie.id);  // 영화 ID를 데이터 속성에 추가
 
                     // 영화 포스터 이미지
                     const movieImage = document.createElement('img');
@@ -125,6 +126,11 @@
                         <h3>${movie.original_title}</h3>
                         <p><span>평점: ${movie.vote_average}</span></p>
                     `;
+
+                    // 영화 클릭 시 상세 페이지로 이동
+                    movieElement.addEventListener('click', () => {
+                        window.location.href = `movie-detail.html?id=${movie.id}`;
+                    });
 
                     // 영화 요소에 이미지와 정보 추가
                     movieElement.appendChild(movieImage);

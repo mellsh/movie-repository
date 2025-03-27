@@ -46,4 +46,20 @@ app.get('/movies', (req, res) => {
 
 //영화 상세글
 //상세글은 다 보여줄 것임
+app.get('/movies/:id', (req, res) => {
+    const movieId = req.params.id; // URL에서 영화 id 추출
+    const sql = 'SELECT * FROM movies WHERE id = ?';
 
+    db.get(sql, [movieId], (err, row) => {
+        if (err) {
+            console.error("영화 상세 데이터 조회 오류:", err.message);
+            res.status(500).json({ error: '영화 상세 데이터를 가져오는 데 실패했습니다.' });
+        } else {
+            if (row) {
+                res.json(row); // 영화 상세 정보를 JSON 형식으로 응답
+            } else {
+                res.status(404).json({ error: '영화를 찾을 수 없습니다.' });
+            }
+        }
+    });
+});
