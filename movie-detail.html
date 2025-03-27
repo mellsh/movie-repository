@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie Detail</title>
+    <title>영화 상세 정보</title>
     <style>
-        /* (스타일을 간단히 추가하거나 기존 스타일을 그대로 사용할 수 있습니다) */
         body {
             margin: 0;
             padding: 0;
@@ -13,71 +12,201 @@
             background-color: #141414;
             color: #fff;
         }
+        
+        header {
+            background-color: #111;
+            padding: 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
 
         .movie-detail {
             padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
         }
 
         .movie-detail img {
-            width: 100%;
-            max-width: 600px;
+            width: 300px;
             border-radius: 10px;
         }
 
-        .movie-detail h1 {
-            font-size: 2rem;
-            margin-top: 20px;
+        .movie-info {
+            text-align: center;
         }
 
-        .movie-detail p {
+        .movie-info h2 {
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        .movie-info p {
             font-size: 1rem;
             margin: 10px 0;
         }
 
-        .back-btn {
+        .comment-form {
+            margin-top: 30px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .comment-form input, .comment-form textarea {
+            width: 80%;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .comment-form button {
             padding: 10px 20px;
             background-color: #e50914;
+            color: white;
             border: none;
-            color: #fff;
+            border-radius: 5px;
             cursor: pointer;
+        }
+
+        .comment-form button:hover {
+            background-color: #b20710;
+        }
+
+        .comment-section {
+            margin-top: 30px;
+            width: 100%;
+        }
+
+        .comment {
+            background-color: #333;
+            padding: 10px;
+            margin: 10px 0;
             border-radius: 5px;
         }
 
-        .back-btn:hover {
-            background-color: #b20710;
+        .comment strong {
+            font-size: 1.1rem;
+            color: #e50914;
+        }
+
+        .comment p {
+            font-size: 1rem;
+            color: #fff;
         }
     </style>
 </head>
 <body>
 
-    <div class="movie-detail" id="movie-detail">
-        <!-- 영화 상세 정보가 여기 표시됩니다 -->
+    <header>
+        <h1>영화 상세 정보</h1>
+    </header>
+
+    <div class="movie-detail">
+        <!-- 영화 정보는 여기서 출력됩니다 -->
+        <div class="movie-info" id="movie-info">
+            <h2>영화 제목</h2>
+            <p>개요: <span id="movie-overview">영화 개요</span></p>
+            <p>개봉일: <span id="movie-release-date">개봉일</span></p>
+            <p>평점: <span id="movie-vote-average">평점</span></p>
+            <img id="movie-poster" src="" alt="영화 포스터" />
+        </div>
+
+        <!-- 댓글 작성 폼 -->
+        <div class="comment-form">
+            <input type="text" id="nickname-input" placeholder="닉네임을 입력하세요..." />
+            <textarea id="comment-input" placeholder="댓글을 입력하세요..."></textarea>
+            <button id="submit-comment">댓글 작성</button>
+        </div>
+
+        <!-- 댓글 목록 -->
+        <div class="comment-section" id="comment-section">
+            <h2>댓글</h2>
+            <div id="comments-list">
+                <!-- 댓글 목록은 여기에 표시됩니다 -->
+            </div>
+        </div>
     </div>
 
-    <button class="back-btn" onclick="window.history.back()">뒤로 가기</button>
-
     <script>
-        // URL에서 영화 ID 추출
-        const urlParams = new URLSearchParams(window.location.search);
-        const movieId = urlParams.get('id');
+        // 영화 ID 가져오기 (URL 파라미터에서 ID 추출)
+        const movieId = new URLSearchParams(window.location.search).get('id');
 
-        // 영화 상세 정보 가져오기
+        // 영화 정보 불러오기
         fetch(`http://localhost:3000/movies/${movieId}`)
             .then(response => response.json())
             .then(movie => {
-                const movieDetailContainer = document.getElementById('movie-detail');
-                movieDetailContainer.innerHTML = `
-                    <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.original_title}">
-                    <h1>${movie.original_title}</h1>
-                    <p><strong>평점:</strong> ${movie.vote_average}</p>
-                    <p><strong>개봉일:</strong> ${movie.release_date}</p>
-                    <p><strong>상세 정보:</strong> ${movie.overview}</p>
+                // 영화 상세 정보 표시
+                document.getElementById('movie-info').innerHTML = `
+                    <h2>${movie.original_title}</h2>
+                    <p>개요: <span id="movie-overview">${movie.overview}</span></p>
+                    <p>개봉일: <span id="movie-release-date">${movie.release_date}</span></p>
+                    <p>평점: <span id="movie-vote-average">${movie.vote_average}</span></p>
+                    <img id="movie-poster" src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.original_title}" />
                 `;
             })
             .catch(error => {
-                console.error('영화 상세 데이터를 가져오는 데 오류 발생:', error);
-                document.getElementById('movie-detail').textContent = '영화 데이터를 가져오는 데 실패했습니다.';
+                console.error('영화 정보를 가져오는 데 오류 발생:', error);
             });
+
+        // 댓글 작성
+        document.getElementById('submit-comment').addEventListener('click', () => {
+            const commentContent = document.getElementById('comment-input').value;
+            const nickname = document.getElementById('nickname-input').value;
+
+            if (!commentContent.trim() || !nickname.trim()) {
+                alert('댓글 내용과 닉네임을 입력해주세요.');
+                return;
+            }
+
+            fetch(`http://localhost:3000/movies/${movieId}/comments`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ content: commentContent, nickname }),
+            })
+            .then(response => response.json())
+            .then(newComment => {
+                loadComments();  // 댓글 목록 갱신
+                document.getElementById('comment-input').value = ''; // 입력 필드 비우기
+                document.getElementById('nickname-input').value = ''; // 닉네임 입력 필드 비우기
+            })
+            .catch(error => {
+                console.error('댓글 작성 오류:', error);
+            });
+        });
+
+        // 댓글 불러오기
+        function loadComments() {
+            fetch(`http://localhost:3000/movies/${movieId}/comments`)
+                .then(response => response.json())
+                .then(comments => {
+                    const commentsList = document.getElementById('comments-list');
+                    commentsList.innerHTML = ''; // 기존 댓글 비우기
+                    comments.forEach(comment => {
+                        const commentElement = document.createElement('div');
+                        commentElement.classList.add('comment');
+                        commentElement.innerHTML = `
+                            <strong>${comment.nickname}</strong>
+                            <p>${comment.content}</p>
+                        `;
+                        commentsList.appendChild(commentElement);
+                    });
+                })
+                .catch(error => {
+                    console.error('댓글을 불러오는 데 오류 발생:', error);
+                });
+        }
+
+        // 페이지 로드 시 댓글 불러오기
+        loadComments();
     </script>
 
 </body>

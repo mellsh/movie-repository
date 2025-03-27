@@ -63,3 +63,46 @@ app.get('/movies/:id', (req, res) => {
         }
     });
 });
+
+// 댓글 작성 API
+app.post('/movies/:id/comments', express.json(), (req, res) => {
+    const movieId = req.params.id;
+    const { content, nickname } = req.body;
+
+    if (!content || content.trim() === '' || !nickname || nickname.trim() === '') {
+        return res.status(400).json({ error: '댓글 내용과 닉네임을 모두 작성해야 합니다.' });
+    }
+
+    const sql = 'INSERT INTO comments (movie_id, content, nickname) VALUES (?, ?, ?)';
+    db.run(sql, [movieId, content, nickname], function (err) {
+        if (err) {
+            console.error("댓글 작성 오류:", err.message);
+            res.status(500).json({ error: '댓글을 작성하는 데 실패했습니다.' });
+        } else {
+            res.status(201).json({
+                id: this.lastID,
+                movie_id: movieId,
+                content,
+                nickname,
+                created_at: new Date().toISOString()
+            });
+        }
+    });
+});
+
+
+// 댓글 조회 API
+// 댓글 목록 불러오기 API
+app.get('/movies/:id/comments', (req, res) => {
+    const movieId = req.params.id;
+
+    const sql = 'SELECT * FROM comments WHERE movie_id = ? ORDER BY created_at DESC';
+    db.all(sql, [movieId], (err, rows) => {
+        if (err) {
+            console.error("댓글 조회 오류:", err.message);
+            res.status(500).json({ error: '댓글을 불러오는 데 실패했습니다.' });
+        } else {
+            res.json(rows); // 댓글 목록을 JSON으로 반환
+        }
+    });
+});
