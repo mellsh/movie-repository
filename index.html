@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix Style Movie List</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #141414;
+            color: #fff;
+        }
+        
+        header {
+            background-color: #111;
+            padding: 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        .movie-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px;
+            justify-content: center;
+        }
+
+        .movie {
+            width: 150px;
+            height: 250px;
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .movie img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .movie:hover {
+            transform: scale(1.05);
+        }
+
+        .movie-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .movie-info h3 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .movie-info p {
+            font-size: 0.9rem;
+            margin: 5px 0 0;
+        }
+
+        .movie-info span {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #e50914;
+        }
+
+        .loading {
+            text-align: center;
+            color: #fff;
+            font-size: 1.5rem;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Netflix Style Movie List</h1>
+    </header>
+
+    <div class="loading">로딩 중...</div>
+
+    <div class="movie-container" id="movie-container">
+        <!-- 영화 리스트가 여기에 표시됩니다 -->
+    </div>
+
+    <script>
+        // API에서 영화 데이터 가져오기
+        fetch('http://localhost:3000/movies')
+            .then(response => response.json())
+            .then(data => {
+                // 로딩 메시지 제거
+                document.querySelector('.loading').style.display = 'none';
+
+                // 영화 리스트 표시
+                const movieContainer = document.getElementById('movie-container');
+                data.forEach(movie => {
+                    const movieElement = document.createElement('div');
+                    movieElement.classList.add('movie');
+
+                    // 영화 포스터 이미지
+                    const movieImage = document.createElement('img');
+                    movieImage.src = movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : 'https://via.placeholder.com/150x250?text=No+Image';
+
+                    // 영화 정보
+                    const movieInfo = document.createElement('div');
+                    movieInfo.classList.add('movie-info');
+                    movieInfo.innerHTML = `
+                        <h3>${movie.original_title}</h3>
+                        <p><span>평점: ${movie.vote_average}</span></p>
+                    `;
+
+                    // 영화 요소에 이미지와 정보 추가
+                    movieElement.appendChild(movieImage);
+                    movieElement.appendChild(movieInfo);
+
+                    // 영화 요소를 컨테이너에 추가
+                    movieContainer.appendChild(movieElement);
+                });
+            })
+            .catch(error => {
+                console.error('영화 데이터를 가져오는 데 오류 발생:', error);
+                document.querySelector('.loading').textContent = '영화 데이터를 가져오는 데 오류가 발생했습니다.';
+            });
+    </script>
+
+</body>
+</html>
